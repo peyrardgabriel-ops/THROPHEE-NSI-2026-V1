@@ -2,7 +2,7 @@ import arcade
 import random
 import os
 
-# CONSTANTES
+# 
 TILE_SIZE = 60     # taille des tiles
 MAP_WIDTH = 50      # nombre de tiles horizontal
 MAP_HEIGHT = 30     # nombre de tiles vertical
@@ -100,4 +100,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
