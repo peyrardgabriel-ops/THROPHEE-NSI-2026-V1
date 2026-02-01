@@ -6,25 +6,28 @@ import os
 TILE_SIZE = 60     # taille des tiles
 MAP_WIDTH = 50      # nombre de tiles horizontal
 MAP_HEIGHT = 30     # nombre de tiles vertical
-TILE_FOLDER = "assets/tiles"  # chemin vers les tiles
 CAMERA_SPEED = 5    # vitesse de la caméra (pixels par frame)
+SCREEN_WIDTH = 1280 # largeur de la window
+SCREEN_HEIGHT = 720 # hauteur de la window
+
 
 # Liste des chemins d'accès aux images de tiles
-tile_files = [os.path.join(TILE_FOLDER, f) for f in [
-    "0-grass.png",
-    "1-grass.png",
-    "2-bush.png",
-    "2-flower.png"
-]]
+BASE_DIR = os.path.dirname(__file__)
+TILE_FOLDER = os.path.join(BASE_DIR, "assets", "tiles")
 
+tile_files = [
+    os.path.join(TILE_FOLDER, "0-grass.png"),
+    os.path.join(TILE_FOLDER, "1-grass.png"),
+    os.path.join(TILE_FOLDER, "2-bush.png"),
+    os.path.join(TILE_FOLDER, "2-flower.png"),
+]
+
+window = arcade.Window(fullscreen=True,title="MAP-1")
 # FENETRE / JEU
-class TileMapGame(arcade.Window):
+class TileMapGame(arcade.View):
     def __init__(self):
-        super().__init__(fullscreen=True, title="MAP-1")
+        super().__init__()
         arcade.set_background_color(arcade.color.SKY_BLUE)
-
-        # Taille de l'écran
-        self.SCREEN_WIDTH, self.SCREEN_HEIGHT = self.get_size()
 
         # Liste des tiles
         self.tile_list = arcade.SpriteList()
@@ -36,8 +39,8 @@ class TileMapGame(arcade.Window):
         center_x = (MAP_WIDTH * TILE_SIZE) / 2
         center_y = (MAP_HEIGHT * TILE_SIZE) / 2
         self.camera.position = (
-            center_x - self.SCREEN_WIDTH / 2,
-            center_y - self.SCREEN_HEIGHT / 2
+            center_x - SCREEN_WIDTH / 2,
+            center_y - SCREEN_HEIGHT / 2
         )
 
         # Position cible pour smooth movement
@@ -91,6 +94,7 @@ class TileMapGame(arcade.Window):
 # LANCEMENT
 def main():
     game = TileMapGame()
+    window.show_view(game)
     arcade.run()
 
 
