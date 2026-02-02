@@ -8,6 +8,7 @@ MAP_HEIGHT = 30     # nombre de tiles vertical
 CAMERA_SPEED = 5    # vitesse de la caméra (pixels par frame)
 SCREEN_WIDTH = 1280 # largeur de la fenêtre
 SCREEN_HEIGHT = 720 # hauteur de la fenêtre
+#taille reelle de la fenêtre en px : width = 3000 et height = 1800
 
 
 BASE_DIR = os.path.dirname(__file__)
@@ -101,6 +102,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
