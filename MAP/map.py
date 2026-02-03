@@ -15,10 +15,14 @@ BASE_DIR = os.path.dirname(__file__)
 TILE_FOLDER = os.path.join(BASE_DIR, "assets", "tiles")
 
 tile_files = [
-    os.path.join(TILE_FOLDER, "0-grass.png"),
     os.path.join(TILE_FOLDER, "1-grass.png"),
+    os.path.join(TILE_FOLDER, "2-grass.png"),
+    os.path.join(TILE_FOLDER, "3-grass.png"),
+    os.path.join(TILE_FOLDER, "1-bush.png"),
     os.path.join(TILE_FOLDER, "2-bush.png"),
-    os.path.join(TILE_FOLDER, "2-flower.png"),
+    os.path.join(TILE_FOLDER, "3-bush.png"),
+    os.path.join(TILE_FOLDER, "1-rock.png"),
+    os.path.join(TILE_FOLDER, "2-rock.png"),
 ]
 
 
@@ -50,7 +54,7 @@ class TileMapGame(arcade.View):
 
         self.keys_held = set()
 
-  
+
     def setup(self) -> None:
         for row in range(MAP_HEIGHT):
             for col in range(MAP_WIDTH):
