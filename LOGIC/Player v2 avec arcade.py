@@ -1,9 +1,13 @@
 import arcade
 import json
+import os
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 SCREEN_TITLE = "j'ai vrm pas d'idée"
+
+CHEMIN = os.path.dirname(__file__)
+FICHIER = os.path.join(CHEMIN, "save.json")
 
 
 fenetre = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, fullscreen=True)
@@ -118,6 +122,12 @@ class GameView(arcade.View):
         """
         Load the variable data from the file save.json
         """
+        data = {}
+        
+        if not os.path.exists("FICHIER"):
+            open("FICHIER", "w").close()
+        return data
+        
         with open("save.json", "r") as file:
             data = json.load(file)
         return data
@@ -128,3 +138,4 @@ game = GameView()
 # game.add_to_inventory("wooden_sword", 5)
 fenetre.show_view(game)
 arcade.run()
+
