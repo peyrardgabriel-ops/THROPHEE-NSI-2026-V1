@@ -50,7 +50,7 @@ class GameView(arcade.View):
 
         
 
-    def on_update(self, delta_time) -> None:
+    def on_update(self, delta_time:float) -> None:
 
         #partie mouvement 
         if self.direction["right"]:
@@ -108,10 +108,16 @@ class GameView(arcade.View):
         self.inventory[item] += number_of_item
         
     def save_game(self):
+        """
+        Save the variable self.stuff_to_save in the file save.json
+        """
         with open("save.json", "w") as file:
             json.dump(self.stuff_to_save, file,  indent=2, sort_keys=True)
 
     def load_game(self):
+        """
+        Load the variable data from the file save.json
+        """
         with open("save.json", "r") as file:
             data = json.load(file)
         return data
@@ -119,6 +125,6 @@ class GameView(arcade.View):
 
 
 game = GameView()
-game.add_to_inventory("wooden_sword", 5)
+# game.add_to_inventory("wooden_sword", 5)
 fenetre.show_view(game)
 arcade.run()
