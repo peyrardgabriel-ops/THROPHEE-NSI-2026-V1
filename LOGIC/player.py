@@ -1,6 +1,7 @@
 import arcade
 import json
 import os
+from LOGIC.menu_ingame.menu_ingamev1 import InGameMenu
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
@@ -10,8 +11,7 @@ CHEMIN = os.path.dirname(__file__)
 FICHIER = os.path.join(CHEMIN, "save.json")
 
 
-fenetre = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, fullscreen=True)
-fenetre.center_window()
+
 
 
 class GameView(arcade.View):
@@ -33,7 +33,7 @@ class GameView(arcade.View):
             "down":False
         }
 
-        self.inventory = {}
+        self.inventory = self.data["inventory"]
         self.stuff_to_save = {
             "inventory" : self.inventory,
             "player":{
@@ -83,8 +83,8 @@ class GameView(arcade.View):
             self.direction["down"] = True
         
         if symbol == arcade.key.ESCAPE:
-            self.save_game()
-            arcade.close_window()
+            menu = InGameMenu(self)
+            self.window.show_view(menu)
     
     def on_key_release(self, symbol:int, modifiers:int) -> None:
         
@@ -134,6 +134,4 @@ class GameView(arcade.View):
 
 
 
-game = GameView()
-fenetre.show_view(game)
-arcade.run()
+
