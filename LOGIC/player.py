@@ -83,6 +83,7 @@ class GameView(arcade.View):
             self.direction["down"] = True
         
         if symbol == arcade.key.ESCAPE:
+            self.save_game()
             menu = InGameMenu(self)
             self.window.show_view(menu)
     
@@ -131,6 +132,7 @@ class GameView(arcade.View):
         with open(FICHIER, "r") as file:
             data = json.load(file)
         return data
+
 
 
 
