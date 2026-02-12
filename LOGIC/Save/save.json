@@ -1,7 +1,8 @@
 {
     "inventory": {},
     "player": {
-        "player_x": 2903.7734400373884,
-        "player_y": 645.764329880476
+        "player_x": 2500,
+        "player_y": 2500
     }
+
 }
