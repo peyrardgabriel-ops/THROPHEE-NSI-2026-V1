@@ -1,0 +1,152 @@
+import arcade
+import random
+import math
+import os
+from PIL import Image
+
+# --- Configuration ---
+SCREEN_WIDTH = 1920 
+SCREEN_HEIGHT = 1080
+SCREEN_TITLE = "Robot AI Simulation - No Bounce"
+
+SCRIPT_DIR = os.path.dirname(__file__)
+
+ROBOT_SPEED = 2.5 
+SPRITE_SCALING = 1.5
+
+def load_sheet(filename, frame_count):
+    full_path = os.path.join(SCRIPT_DIR, filename)
+    try:
+        sheet = Image.open(full_path).convert("RGBA")
+    except FileNotFoundError:
+        print(f"Erreur : Le fichier {filename} est introuvable.")
+        return []
+
+    w, h = sheet.size
+    frame_w = w // frame_count
+    textures = []
+    for i in range(frame_count):
+        left = i * frame_w
+        right = left + frame_w
+        frame = sheet.crop((left, 0, right, h))
+        tex = arcade.Texture(name=f"{filename}_{i}", image=frame)
+        textures.append(tex)
+    return textures
+
+# --------- ROBOT ---------
+class Robot(arcade.Sprite):
+    def __init__(self, game):
+        super().__init__()
+        self.game = game
+        self.scale = SPRITE_SCALING
+
+        self.time_counter = 0
+        self.frame_index = 0
+        self.state = "IDLE"
+        self.target_timer = 0
+
+        self.idle_textures = load_sheet("Robot_Idle.png", 6)
+        self.run_textures = load_sheet("Robot_run.png", 4)
+        self.shoot_textures = load_sheet("Robot_Shoot.png", 8)
+
+        if self.idle_textures:
+            self.texture = self.idle_textures[0]
+
+    def update_animation(self, delta_time=1/60):
+        if self.state == "SHOOT":
+            frames = self.shoot_textures
+            speed = 0.10
+        elif self.state == "RUN":
+            frames = self.run_textures
+            speed = 0.12
+        else:
+            frames = self.idle_textures
+            speed = 0.18
+
+        if not frames: return
+
+        self.time_counter += delta_time
+        if self.time_counter >= speed:
+            self.time_counter = 0
+            self.frame_index = (self.frame_index + 1) % len(frames)
+            self.texture = frames[self.frame_index]
+
+            if self.state == "SHOOT" and self.frame_index == 4:
+                self.game.fire_bullet()
+
+        if self.change_x < 0:
+            self.scale_x = -SPRITE_SCALING
+        elif self.change_x > 0:
+            self.scale_x = SPRITE_SCALING
+
+# --------- GAME ---------
+class MyGame(arcade.Window):
+    def __init__(self):
+        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, fullscreen=True)
+        arcade.set_background_color(arcade.color.DARK_SLATE_GRAY)
+
+        self.robot_list = arcade.SpriteList()
+        self.bullet_list = arcade.SpriteList()
+        self.robot = None
+
+    def setup(self):
+        self.robot = Robot(self)
+        self.robot.position = (self.width // 2, self.height // 2)
+        self.robot_list.append(self.robot)
+
+    def on_draw(self):
+        self.clear()
+        self.robot_list.draw()
+        self.bullet_list.draw()
+
+    def fire_bullet(self):
+        bullet = arcade.Sprite(os.path.join(SCRIPT_DIR, "Balle.png"), scale=1.0)
+        bullet.position = self.robot.position
+        direction = 1 if self.robot.scale_x > 0 else -1
+        bullet.change_x = direction * 12
+        self.bullet_list.append(bullet)
+
+    def on_update(self, delta_time):
+        self.robot.update_animation(delta_time)
+        self.bullet_list.update()
+
+        # IA : Choix de mouvement
+        if self.robot.target_timer <= 0:
+            if random.random() < 0.4: 
+                self.robot.state = "IDLE"
+                self.robot.change_x = 0
+                self.robot.change_y = 0
+                self.robot.target_timer = random.uniform(1.5, 3.0)
+            else:
+                self.robot.state = "RUN"
+                angle = random.uniform(0, 2 * math.pi)
+                self.robot.change_x = math.cos(angle) * ROBOT_SPEED
+                self.robot.change_y = math.sin(angle) * ROBOT_SPEED
+                self.robot.target_timer = random.uniform(2.0, 5.0)
+
+        self.robot.target_timer -= delta_time
+        
+        # Application du mouvement
+        self.robot.center_x += self.robot.change_x
+        self.robot.center_y += self.robot.change_y
+
+        # --- GESTION DES BORDURES (SANS REBOND) ---
+        # Si le robot dépasse, on le recale sur le bord
+        if self.robot.left < 0:
+            self.robot.left = 0
+        elif self.robot.right > self.width:
+            self.robot.right = self.width
+
+        if self.robot.bottom < 0:
+            self.robot.bottom = 0
+        elif self.robot.top > self.height:
+            self.robot.top = self.height
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ESCAPE:
+            self.close()
+
+if __name__ == "__main__":
+    game = MyGame()
+    game.setup()
+    arcade.run()
