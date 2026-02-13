@@ -2,8 +2,7 @@ import arcade
 import os
 
 MENU_IMAGE = os.path.join(os.path.dirname(__file__), "menu_ingame.jpg")
-MAP_HEIGHT = 5000
-MAP_WIDTH = 5000
+
 
 class ButtonSprite(arcade.Sprite):
     def __init__(self, center_x, center_y, width, height, color, text):
@@ -15,6 +14,13 @@ class ButtonSprite(arcade.Sprite):
         self.width = width
         self.height = height
         self.text = text
+        self.label = arcade.Text(text=self.text,
+                                    x = self.center_x,
+                                    y = self.center_y,
+                                    color = arcade.color.BLACK,
+                                    font_size= 20,
+                                    anchor_x="center",
+                                    anchor_y="center")
 
         
 
@@ -50,7 +56,8 @@ class InGameMenu(arcade.View):
                 text=name
             )
             self.button_list.append(btn)
-
+        
+        # Caméra
         self.camera = arcade.camera.Camera2D()
         self.camera.position = self.window.center_x, self.window.center_y
 
@@ -61,15 +68,7 @@ class InGameMenu(arcade.View):
         self.button_list.draw()
         # Dessiner le texte sur les boutons
         for btn in self.button_list:
-            arcade.draw_text(
-                btn.text,
-                btn.center_x,
-                btn.center_y,
-                arcade.color.BLACK,
-                font_size=20,
-                anchor_x="center",
-                anchor_y="center"
-            )
+            btn.label.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
         # Vérifie quel bouton est cliqué
