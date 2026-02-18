@@ -1,8 +1,11 @@
 {
-    "inventory": {},
+    "inventory": {
+        "gear wheel": 532,
+        "printed circuit": 2,
+        "rotten flesh": 3
+    },
     "player": {
-        "player_x": 2500,
-        "player_y": 2500
+        "player_x": 1012.3644403507933,
+        "player_y": 2271.924773035571
     }
-
 }

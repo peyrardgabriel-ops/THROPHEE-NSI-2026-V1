@@ -85,6 +85,3 @@ class InGameMenu(arcade.View):
     def on_key_press(self, symbol, modifiers):
         if symbol == arcade.key.ESCAPE:
             self.window.show_view(self.game_view) 
-
-
-
