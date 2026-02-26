@@ -1,5 +1,4 @@
 import arcade
-import os
 from PIL import Image
 
 

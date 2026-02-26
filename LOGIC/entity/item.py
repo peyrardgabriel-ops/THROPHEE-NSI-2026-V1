@@ -1,13 +1,23 @@
-from LOGIC.entity.entity2 import Entity
+import math
+
+from LOGIC.entity.entity import Entity
 
 IMG_COIN = ":resources:/images/items/coinGold.png"
 
-class Item(Entity):
-    def __init__(self, x, y,
-                name_or_precise_type = None,
-                path_or_texture = IMG_COIN):
-        super().__init__(x, y, name_or_precise_type=name_or_precise_type, path_or_texture= path_or_texture)
 
-class Gear_wheel(Item):
-    def __init__(self, x, y, name_or_precise_type=None):
-        super().__init__(x, y, name_or_precise_type)
+class Item(Entity):
+    type = "item"
+
+    def __init__(self, x, y,
+                path_or_texture = IMG_COIN):
+        super().__init__(x, y, path_or_texture= path_or_texture)
+        
+
+class Printed_circuit(Item):
+    type = "printed circuit"
+    path_or_texture = IMG_COIN
+    def __init__(self, x, y):
+        super().__init__(x, y, path_or_texture = self.path_or_texture)
+        
+
+

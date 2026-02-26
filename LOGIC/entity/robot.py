@@ -5,16 +5,25 @@ import arcade
 
 from LOGIC.entity.enemy import Enemy
 from LOGIC.textures.load_sheet import load_sheet
-from LOGIC.entity.entity2 import Entity
+from LOGIC.entity.entity import Entity
 
 MAP_WIDTH = 5000
 MAP_HEIGHT = 5000
 
+TEXTURES = {"idle": "LOGIC/textures/enemy/robot/Robot_Idle.png",
+                    "run": "LOGIC/textures/enemy/robot/Robot_run.png",
+                    "shoot": "LOGIC/textures/enemy/robot/Robot_Shoot.png",
+                    "bullet": "LOGIC/textures/enemy/robot/Bullet.png"}
+        
+idle_textures = load_sheet(TEXTURES["idle"], 6)
+run_textures = load_sheet(TEXTURES["run"], 4)
+shoot_textures = load_sheet(TEXTURES["shoot"], 8)
+bullet_textures = load_sheet(TEXTURES["bullet"], 1)
+
 class Robot(Enemy):
     ROBOT_SPEED = 200
-    ROBOT_HP = 125
-    ROBOT_DAMAGE = 15
-    robot_list = arcade.SpriteList()
+    ROBOT_HP = 5
+    
 
     BULLET_SPEED = 100
 
@@ -24,22 +33,16 @@ class Robot(Enemy):
         self.attack_range = 200
         self.speed = self.ROBOT_SPEED
         self.hp = self.ROBOT_HP
-        self.damage = self.ROBOT_DAMAGE
         self.drop_loot = "gear wheel"
         self.player = player
+        self.bullet_list = arcade.SpriteList()
+
+
         if random.random() < 0.01:
             self.drop_loot = "printed circuit"
 
         # Textures
-        TEXTURES = {"idle": "LOGIC/textures/enemy/robot/Robot_Idle.png",
-                    "run": "LOGIC/textures/enemy/robot/Robot_run.png",
-                    "shoot": "LOGIC/textures/enemy/robot/Robot_Shoot.png",
-                    "bullet": "LOGIC/textures/enemy/robot/Bullet.png"}
         
-        self.idle_textures = load_sheet(TEXTURES["idle"], 6)
-        self.run_textures = load_sheet(TEXTURES["run"], 4)
-        self.shoot_textures = load_sheet(TEXTURES["shoot"], 8)
-        self.bullet_textures = load_sheet(TEXTURES["bullet"], 1)
 
         
 
@@ -51,26 +54,24 @@ class Robot(Enemy):
         super().__init__(x, y,
                         detection_range= self.detection_range,
                         name_or_precise_type=name_or_precise_type,
-                        path_or_texture=self.idle_textures[0],
+                        path_or_texture=idle_textures[0],
                         speed = self.speed,
-                        hp= self.hp,
-                        damage=self.damage)
-        self.bullet_list = arcade.SpriteList()
+                        hp= self.hp)
 
-        if self.idle_textures:
-            self.texture = self.idle_textures[0]
+        if idle_textures:
+            self.texture = idle_textures[0]
 
         
 
     def update_animation(self, delta_time=1/60):
         if self.state == "ATTACK":
-            frames = self.shoot_textures
+            frames = shoot_textures
             speed = 0.10
         elif self.state == "RUN":
-            frames = self.run_textures
+            frames = run_textures
             speed = 0.12
         else:
-            frames = self.idle_textures
+            frames = idle_textures
             speed = 0.18
 
         if not frames: return
@@ -94,7 +95,8 @@ class Robot(Enemy):
         """Fire a bullet in the direction of the player to attack it"""
         bullet = Entity(x = self.center_x,
                         y = self.center_y,
-                        path_or_texture=self.bullet_textures[0])
+                        path_or_texture=bullet_textures[0],
+                        hp=7)
                         
         direction =math.atan2((other.center_y - self.center_y),
                             (other.center_x - self.center_x))
@@ -105,8 +107,10 @@ class Robot(Enemy):
 
     def update(self, delta_time = 1 / 60):
         self.update_animation(delta_time)
-        if self.bullet_list:
-            self.bullet_list.update()
+        for bullet in self.bullet_list:
+            bullet.hp -= delta_time
+            if bullet.hp <= 0:
+                bullet.remove_from_sprite_lists()
 
     
     def movement(self, delta_time = 1 / 60):
@@ -129,4 +133,7 @@ class Robot(Enemy):
         
         # Application du mouvement
         self.center_x += self.change_x 
-        self.center_y += self.change_y       
+        self.center_y += self.change_y    
+
+    def get_bullet(self):
+        return self.bullet_list   

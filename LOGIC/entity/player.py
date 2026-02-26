@@ -1,4 +1,4 @@
-from LOGIC.entity.entity2 import Entity
+from LOGIC.entity.entity import Entity
 
 IMG_PLAYER = ":resources:/images/animated_characters/male_adventurer/maleAdventurer_idle.png"
 PLAYER_SPEED = 400

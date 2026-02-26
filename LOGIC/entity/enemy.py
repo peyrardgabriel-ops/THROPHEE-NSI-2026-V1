@@ -1,5 +1,5 @@
 import arcade
-from LOGIC.entity.entity2 import Entity
+from LOGIC.entity.entity import Entity
 
 
 class Enemy(Entity):
@@ -10,14 +10,13 @@ class Enemy(Entity):
                 detection_range : int = 300,
                 speed : int = None,
                 hp : int = 100,
-                damage : int = 10,
-                bullet_list = None):
+                damage : int = 10):
         self.path_or_texture = path_or_texture
-        self.bullet_list = arcade.SpriteList()
         
        
 
         super().__init__(x, y,
                         name_or_precise_type,
-                        self.path_or_texture)
+                        self.path_or_texture,
+                        hp=hp)
         
