@@ -27,6 +27,7 @@ class Player(Entity):
 
         self.speed = self.PLAYER_SPEED
         self.hp = self.PLAYER_HP
+        self.max_hp = self.PLAYER_HP
 
         
         self.key_pressed = set()
