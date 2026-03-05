@@ -21,7 +21,7 @@ class Case(arcade.Sprite):
         self.height = height
 
 class InventoryMenu(arcade.View):
-    def __init__(self, game, file):
+    def __init__(self, game, file, inventory, gameview):
         super().__init__()
         self.game = game
         self.file = file
@@ -30,8 +30,8 @@ class InventoryMenu(arcade.View):
         self.camera = arcade.camera.Camera2D()
         self.camera.position = self.window.width // 2, self.window.height // 2
 
-        self.inventory = Inventory(file)
-        self.gameview = GameView(self.game, self.file)
+        self.inventory = inventory
+        self.gameview = gameview
 
         case_width = 80
         case_height = 80
@@ -77,6 +77,11 @@ class InventoryMenu(arcade.View):
                 if (item.center_x - item.width / 2 <= x <= item.center_x + item.width / 2 and
                     item.center_y - item.height / 2 <= y <= item.center_y + item.height / 2):
                     self.drop_item(item.name)
+
+        self.item_list.clear()
+        self.text_list.clear()
+        self.text_list.append(self.text)
+        self.place_item()
                     
                     
 
@@ -122,8 +127,9 @@ class InventoryMenu(arcade.View):
         y = random.randint(-100, 100) + self.gameview.player.center_y
         new_item = item_class(x=x, y=y)
         self.gameview.item_list.append(new_item)
+        
 
 
     def back_to_game(self):
-        self.game.switch_scene(GameView(self.game, save_file=self.file))
+        self.window.show_view(self.gameview)
 
