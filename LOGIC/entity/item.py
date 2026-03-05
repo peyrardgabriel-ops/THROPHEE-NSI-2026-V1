@@ -19,5 +19,14 @@ class Printed_circuit(Item):
     def __init__(self, x, y):
         super().__init__(x, y, path_or_texture = self.path_or_texture)
         
+class Coin(Item):
+    type = "coin"
+    path_or_texture = IMG_COIN
+    def __init__(self, x, y):
+        super().__init__(x, y, path_or_texture = self.path_or_texture)
+
+
+
+
 
 

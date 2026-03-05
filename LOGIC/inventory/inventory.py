@@ -1,13 +1,25 @@
-from LOGIC.Save.save import load_file
+from LOGIC.save.save import load_file, save_file
+import LOGIC.entity as entity
+
+
+
+def get_item_class(name: str):
+        for cls in entity.Item.__subclasses__():
+            if cls.type == name:
+                return cls
+        return None
 
 class Inventory():
     def __init__(self,file, capacity = 10):
+        self.file = file
+        self.capacity = capacity
+
         data = load_file(file)
         if data["inventory"]:
             self.inventory = data["inventory"]
         else:
             self.inventory = []
-        self.capacity = capacity
+        
 
         self.item_in_use = None
 
@@ -27,6 +39,7 @@ class Inventory():
         if number_of_item == 0:
             return
         for i, (name, quantity) in enumerate(self.inventory):
+            print(name, quantity)
             if name == obj:
                 self.inventory[i] = (name, quantity - number_of_item)
                 if self.inventory[i][1] < 0:
@@ -42,7 +55,32 @@ class Inventory():
                 return True
         return False
     
+    def get_quantity(self, item_name):
+        for name, quantity in self.inventory:
+            if name == item_name:
+                return quantity
+        return 0
+    
+    def save_inventory(self, file):
+        data = load_file(file)  
+        data["inventory"] = self.inventory  
+        save_file(data, file)
 
 
+    def choose_best_sword(self):
+        
+        swords = [i for i in [get_item_class(item[0]) for item in self.inventory if "sword" in item[0]] if i ]
 
+        if not swords:
+            return entity.item_cls.fist.Fist
 
+        best_sword = swords[0]
+
+        for sword in swords:
+            if sword.get_damage() > best_sword.get_damage():
+                best_sword = sword
+
+        return best_sword
+
+    
+            

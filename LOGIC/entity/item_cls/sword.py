@@ -3,11 +3,13 @@ from LOGIC.entity import Item
 
 IMG_SWORD = "LOGIC/textures/item/sword/sword.png"
 
+
+
 class Sword(Item):
     type = "sword"
     path_or_texture = IMG_SWORD
 
-    def __init__(self, gameview, x, y, damage:int = 1):
+    def __init__(self, x, y, texture= IMG_SWORD, damage:int = 0, gameview= None):
         self.gameview = gameview
         
         
@@ -63,5 +65,9 @@ class Sword(Item):
                 self.angle = 90 - math.degrees(math.atan2(dy, dx))
                 if self.attack_target_angle <= -(3 * math.pi) / 2:
                     self.is_attacking = False
+
+    @staticmethod
+    def get_damage():
+        return 0
         
          

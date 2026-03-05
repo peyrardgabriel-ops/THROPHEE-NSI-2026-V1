@@ -41,11 +41,6 @@ class Robot(Enemy):
         if random.random() < 0.01:
             self.drop_loot = "printed circuit"
 
-        # Textures
-        
-
-        
-
         self.time_counter = 0
         self.frame_index = 0
         self.state = "IDLE"
@@ -57,6 +52,7 @@ class Robot(Enemy):
                         path_or_texture=idle_textures[0],
                         speed = self.speed,
                         hp= self.hp)
+        
 
         if idle_textures:
             self.texture = idle_textures[0]
