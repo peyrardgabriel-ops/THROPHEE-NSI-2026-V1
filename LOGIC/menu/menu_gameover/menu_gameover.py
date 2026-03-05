@@ -9,10 +9,11 @@ from LOGIC.save.save import delete_file
 
 
 class MenuGameover(arcade.View):
-    def __init__(self, game, file):
+    def __init__(self, game, file, gameview):
         super().__init__()
         self.game = game
         self.file = file
+        self.gameview = gameview
 
         self.background_color = arcade.color.RED
 
@@ -79,7 +80,10 @@ class MenuGameover(arcade.View):
 
 
     def on_show_view(self):
-        delete_file(file_to_delete=self.file)
+        self.gameview.player.hp = self.gameview.player.max_hp
+        self.gameview.inventory.clear()
+        self.gameview.player.center_x = 2500
+        self.gameview.player.center_y = 2500
 
     
     def load_start(self):
@@ -87,5 +91,4 @@ class MenuGameover(arcade.View):
         self.game.switch_scene(MenuStart(self.game))
     
     def load_game(self):
-        from LOGIC.logic import GameView
-        self.game.switch_scene(GameView(self.game, save_file=self.file))
+        self.window.show_view(self.gameview)
