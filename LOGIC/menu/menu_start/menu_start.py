@@ -84,7 +84,6 @@ class MenuStart(arcade.View):
                 btn.width = self.button_width
                 btn.height = self.button_height
 
-
     def show_save(self):
         from LOGIC.menu.menu_save.menu_save import MenuSave
         self.game.switch_scene(MenuSave(self.game))

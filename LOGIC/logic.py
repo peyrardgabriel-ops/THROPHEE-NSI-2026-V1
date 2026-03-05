@@ -2,9 +2,9 @@ import arcade
 import math
 import random
 
-from LOGIC.Save.save import save_file, load_file
+from LOGIC.save.save import save_file, load_file, dict_to_sprite_list, sprite_list_to_dict
 import LOGIC.entity as entity
-from LOGIC.entity.item_cls import Sword, Gear_wheel
+from LOGIC.entity.item_cls.fist import Fist
 from LOGIC.inventory.inventory import Inventory
 
 # Taille des écrans / fenetre
@@ -22,6 +22,7 @@ CAMERA_PAN_SPEED = 0.2
 
 
 
+
 class GameView(arcade.View):
     def __init__(self, game = None, save_file = ""):
         self.game = game
@@ -32,10 +33,12 @@ class GameView(arcade.View):
         arcade.set_background_color(arcade.color.LIGHT_BLUE)
 
         # Recupère les données stockées
-        data = load_file(self.save_file)
+        data = load_file(self.save_file)        
 
-        # Deplacement
-        self.key_pressed = set()
+        # Inventaire
+        self.inventory_cls = Inventory(save_file)
+        self.inventory = self.inventory_cls.inventory
+        
 
         # Player
         self.player_list = arcade.SpriteList(use_spatial_hash=False)
@@ -44,27 +47,30 @@ class GameView(arcade.View):
                              name_or_precise_type = "JP")
         self.attack_direction = 1
         self.player_list.append(self.player)
+        
 
         if self.map.can_attack:
-            self.sword_list = arcade.SpriteList(use_spatial_hash=False)
-            sword = Sword(gameview=self,
-                        x= self.player.center_x,
-                        y = self.player.center_y,
-                        damage=5)
-            sword.scale = 2
-            self.sword_list.append(sword)
+            self.choose_best_sword()
+            
 
         # Ennemis 
         self.current_number_enemy = 0
-        self.enemy_list = arcade.SpriteList(use_spatial_hash=True)
+        try:
+            if dict_to_sprite_list(data["enemy_list"]) != []:
+                self.enemy_list = dict_to_sprite_list(data["enemy_list"])
+        except:
+            self.enemy_list = arcade.SpriteList(use_spatial_hash=True)
         self.enemy_bullet_list = arcade.SpriteList(use_spatial_hash=True)
         self.number_max_enemy = 100
-        
-        
-        
+
 
         # Items 
-        self.item_list = arcade.SpriteList(use_spatial_hash=True)
+        try:
+            if dict_to_sprite_list(data["item_list"]) != []:
+                self.item_list = dict_to_sprite_list(data["item_list"])
+        except:
+            self.item_list = arcade.SpriteList(use_spatial_hash=True)
+        
         
         # Caméra
         self.camera = arcade.camera.Camera2D()
@@ -75,11 +81,7 @@ class GameView(arcade.View):
         self.is_debug_menu_open = False
             
 
-        # Inventaire
-        self.inventory_cls = Inventory(save_file)
-        self.inventory = self.inventory_cls.inventory
-        if not self.inventory_cls.is_existing("sword"):
-            self.inventory_cls.add_to_inventory("sword")
+        
 
         # Sauvegarde
         self.stuff_to_save = {
@@ -87,10 +89,10 @@ class GameView(arcade.View):
                                 "player_x":self.player.center_x,
                                 "player_y": self.player.center_y
                                 },
-                            "inventory": self.inventory
+                            "inventory": self.inventory,
+                            # "enemy_list": sprite_list_to_dict(self.enemy_list),
+                            # "item_list": sprite_list_to_dict(self.item_list)
                             }
-        
-        
         
 
     def on_draw(self):
@@ -146,7 +148,9 @@ class GameView(arcade.View):
                                 "player_x":self.player.center_x,
                                 "player_y": self.player.center_y
                                 },
-                            "inventory": self.inventory
+                            "inventory": self.inventory,
+                            # "enemy_list": sprite_list_to_dict(self.enemy_list),
+                            # "item_list": sprite_list_to_dict(self.item_list)
                             }
         
 
@@ -176,20 +180,24 @@ class GameView(arcade.View):
         if symbol == arcade.key.ESCAPE:
             save_file(self.stuff_to_save, self.save_file)
             self.open_pause()
-        elif symbol == arcade.key.E:
+        elif symbol == arcade.key.A:
             save_file(self.stuff_to_save, self.save_file)
             self.open_inventory()
+        elif symbol == arcade.key.C:
+            self.open_craft()
         elif symbol == arcade.key.F3:
             self.is_debug_menu_open = not self.is_debug_menu_open
         elif symbol == arcade.key.K:
             self.player.hp = 0
         else:
-            self.key_pressed.add(symbol)
+            self.player.key_pressed.add(symbol)
+
+        
 
 
     def on_key_release(self, symbol, modifiers):
-        if symbol in self.key_pressed:
-            self.key_pressed.remove(symbol)
+        if symbol in self.player.key_pressed:
+            self.player.key_pressed.remove(symbol)
 
 
     def on_mouse_press(self, x, y, button, modifiers):
@@ -211,7 +219,8 @@ class GameView(arcade.View):
     def on_fixed_update(self, delta_time):
         # Mise à jour régulière des animations
         self.enemy_list.update_animation(delta_time)
-        self.enemy_list.update()
+        self.enemy_list.update(delta_time)
+        self.player_list.update(delta_time)
 
         if self.map.can_attack:
             self.sword_attack()
@@ -221,15 +230,8 @@ class GameView(arcade.View):
         self.enemy_movement(delta_time=delta_time)
         
 
-        # Déplacements du joueur
-        if arcade.key.Z in self.key_pressed:
-            self.player.center_y += self.player.speed * delta_time
-        if arcade.key.S in self.key_pressed:
-            self.player.center_y -= self.player.speed * delta_time
-        if arcade.key.D in self.key_pressed:
-            self.player.center_x += self.player.speed * delta_time
-        if arcade.key.Q in self.key_pressed:
-            self.player.center_x -= self.player.speed * delta_time
+        
+        
 
         
             
@@ -245,25 +247,6 @@ class GameView(arcade.View):
             self.window.delta_time,
             panning_fraction)
         
-
-    def create_enemy(self, number_of_enemy:int = 100, area_of_spawn:tuple = ((0,0), (MAP_WIDTH, MAP_HEIGHT))):
-        """Create (number_of_enemy) enemy and add them to the self.enemy_list.
-        do not put too many enemies in a limited space : the program could run endlessly"""
-
-        if self.map.can_enemy_spawn:
-            enemy_classes = entity.Enemy.__subclasses__()
-            x_min, y_min = area_of_spawn[0]
-            x_max, y_max = area_of_spawn[1]
-            for _ in range(number_of_enemy):
-                x = random.randint(x_min, x_max)
-                y = random.randint(y_min, y_max)
-                enemy_class = random.choice(enemy_classes)
-                enemy = enemy_class(x=x, y=y, player = self.player)
-                self.enemy_list.append(enemy)
-                    
-
-
-    
 
     # Items
     def get_item_class(self, name: str):
@@ -295,7 +278,7 @@ class GameView(arcade.View):
     # Differents menus
     def open_pause(self):
         from LOGIC.menu.menu_pause.menu_pause import MenuPause
-        self.game.switch_scene(MenuPause(self.game))
+        self.game.switch_scene(MenuPause(self.game, self.save_file))
 
     def open_inventory(self):
         from LOGIC.menu.menu_inventory.menu_inventaire import InventoryMenu
@@ -307,7 +290,12 @@ class GameView(arcade.View):
         from LOGIC.menu.menu_gameover.menu_gameover import MenuGameover
         self.game.switch_scene(MenuGameover(game=self.game, file=self.save_file))
 
+    def open_craft(self):
+        from LOGIC.menu.menu_craft.menu_craft import MenuCraft
+        self.game.switch_scene(MenuCraft(self.game, self.save_file))
 
+
+    # Ennemis
     def enemy_movement(self, delta_time:float) -> None:
         """Define the 3 modes of the enemy 
 
@@ -357,7 +345,23 @@ class GameView(arcade.View):
                 enemy.bottom = 0
             elif enemy.top > MAP_HEIGHT:
                 enemy.top = MAP_HEIGHT
-    
+
+    def create_enemy(self, number_of_enemy:int = 100, area_of_spawn:tuple = ((0,0), (MAP_WIDTH, MAP_HEIGHT))):
+        """Create (number_of_enemy) enemy and add them to the self.enemy_list.
+        do not put too many enemies in a limited space : the program could run endlessly"""
+
+        if self.map.can_enemy_spawn:
+            enemy_classes = entity.Enemy.__subclasses__()
+            x_min, y_min = area_of_spawn[0]
+            x_max, y_max = area_of_spawn[1]
+            for _ in range(number_of_enemy):
+                x = random.randint(x_min, x_max)
+                y = random.randint(y_min, y_max)
+                enemy_class = random.choice(enemy_classes)
+                enemy = enemy_class(x=x, y=y, player = self.player)
+                self.enemy_list.append(enemy)
+
+    # Epées 
     def sword_attack(self) -> None:
         if self.map.can_attack:
             for sword in self.sword_list:
@@ -382,6 +386,16 @@ class GameView(arcade.View):
                                                 y = enemy.center_y,
                                                 item= enemy.drop_loot)
                                     enemy.remove_from_sprite_lists()
+
+    def choose_best_sword(self):
+        self.sword_list = arcade.SpriteList(use_spatial_hash=False)
+
+        best_sword = self.inventory_cls.choose_best_sword()
+        sword = best_sword(x= self.player.center_x,
+                        y = self.player.center_y, gameview=self)
+        sword.scale = 2
+        self.sword_list.append(sword)
+
 
 class Map:
     def __init__(self,

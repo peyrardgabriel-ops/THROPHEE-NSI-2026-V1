@@ -1,31 +1,24 @@
 import arcade
-import os
 
 from LOGIC.menu.button_sprite import ButtonSprite
-from LOGIC.save.save import delete_file
+from LOGIC.craft.craft import Craft
 
-
-
-
-
-class MenuGameover(arcade.View):
+class MenuCraft(arcade.View):
     def __init__(self, game, file):
-        super().__init__()
         self.game = game
         self.file = file
+        super().__init__()
 
-        self.background_color = arcade.color.RED
+        self.craft = Craft(file)
 
-        # Boutons
         self.button_list = arcade.SpriteList()
         self.button_width = 300
         self.button_height = 60
         spacing = 20
-        y_start = self.window.height // 2 + 20
+        y_start = self.window.height // 2 + 50
 
-        # Crée chaque bouton comme sprite
-        names = ["RESPAWN", "QUIT"]
-        for i, name in enumerate(names):
+        self.names = self.craft.list_can_craft()
+        for i, name in enumerate(self.names):
             y = y_start - i * (self.button_height + spacing)
             btn = ButtonSprite(
                 center_x=self.window.width // 2,
@@ -50,14 +43,19 @@ class MenuGameover(arcade.View):
             btn.label.draw()
 
     def on_mouse_press(self, x, y, button, modifiers):
-        # Vérifie quel bouton est cliqué
         for btn in self.button_list:
             if (btn.center_x - btn.width / 2 <= x <= btn.center_x + btn.width / 2 and
                 btn.center_y - btn.height / 2 <= y <= btn.center_y + btn.height / 2):
-                if btn.text == "RESPAWN":
-                    self.load_game()
-                elif btn.text == "QUIT":
-                    self.load_start()
+                item_name = btn.text
+                if self.craft.can_craft_item(item_name):
+                    self.craft.craft(item_name)
+                    self.refresh_buttons()
+                return
+                
+
+    def on_key_press(self, symbol, modifiers):
+        if symbol == arcade.key.ESCAPE or symbol == arcade.key.C:
+            self.load_game()
 
     def on_mouse_motion(self, x, y, dx, dy):
 
@@ -73,19 +71,27 @@ class MenuGameover(arcade.View):
                 
                 btn.width = self.button_width
                 btn.height = self.button_height
-            
 
-
-
-
-    def on_show_view(self):
-        delete_file(file_to_delete=self.file)
-
-    
-    def load_start(self):
-        from LOGIC.menu.menu_start.menu_start import MenuStart
-        self.game.switch_scene(MenuStart(self.game))
-    
     def load_game(self):
         from LOGIC.logic import GameView
         self.game.switch_scene(GameView(self.game, save_file=self.file))
+
+    def refresh_buttons(self):
+        self.button_list.clear()
+
+        self.names = self.craft.list_can_craft()
+
+        spacing = 20
+        y_start = self.window.height // 2 + 50
+
+        for i, name in enumerate(self.names):
+            y = y_start - i * (self.button_height + spacing)
+            btn = ButtonSprite(
+                center_x=self.window.width // 2,
+                center_y=y,
+                width=self.button_width,
+                height=self.button_height,
+                color=(255, 255, 255, 180),
+                text=name
+            )
+            self.button_list.append(btn)

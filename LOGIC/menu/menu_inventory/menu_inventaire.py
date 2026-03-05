@@ -1,8 +1,11 @@
 import arcade
+import random
 
 from LOGIC.inventory.inventory import Inventory
-from LOGIC.entity.item_cls import Gear_wheel, Sword
+from LOGIC.entity.item_cls import *
 from LOGIC.entity.item import Item
+from LOGIC.logic import GameView
+
 
 
 SCREEN_WIDTH = 1280
@@ -28,6 +31,7 @@ class InventoryMenu(arcade.View):
         self.camera.position = self.window.width // 2, self.window.height // 2
 
         self.inventory = Inventory(file)
+        self.gameview = GameView(self.game, self.file)
 
         case_width = 80
         case_height = 80
@@ -64,9 +68,18 @@ class InventoryMenu(arcade.View):
             texts.draw()
 
     def on_key_press(self, symbol, modifiers):
-        if symbol == arcade.key.ESCAPE or symbol == arcade.key.E:
+        if symbol == arcade.key.ESCAPE or symbol == arcade.key.A:
             self.back_to_game()
-    
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            for item in self.item_list:
+                if (item.center_x - item.width / 2 <= x <= item.center_x + item.width / 2 and
+                    item.center_y - item.height / 2 <= y <= item.center_y + item.height / 2):
+                    self.drop_item(item.name)
+                    
+                    
+
     
 
 
@@ -82,22 +95,35 @@ class InventoryMenu(arcade.View):
         
         for index, (item_name, number) in enumerate(self.inventory.inventory):
             item_class = self.get_item_class(item_name)
+            i = index % 10 + 2 
+            j = index // 10 + 2 
+            x = i * 100
+            y = j * 100 
+
             if item_class:
                 item = arcade.Sprite(path_or_texture=item_class.path_or_texture, scale=0.7)
-
-                i = index % 10 + 2 
-                j = index // 10 + 2 
-                item.center_x = i * 100
-                item.center_y = j * 100 
-
+                item.center_x = x
+                item.center_y = y
+                item.name = item_name
                 self.item_list.append(item)
 
             
-            quantity = arcade.Text(f"{number}", x= item.center_x-30 ,y= item.center_y-30, color=arcade.color.WHITE, font_size=14)
+            quantity = arcade.Text(f"{number}", x= x-30 ,y= y-30, color=arcade.color.WHITE, font_size=14)
             self.text_list.append(quantity)
+
+    
+    def drop_item(self, item:str):
+        """Create a item at the coordonates x,y and store it in the self.item_list"""
+        item_class = self.get_item_class(item)
+        if item_class == None:
+            raise ValueError(f"Item inconnu : {item}")
+        self.inventory.remove_from_inventory(item)
+        x = random.randint(-100, 100) + self.gameview.player.center_x
+        y = random.randint(-100, 100) + self.gameview.player.center_y
+        new_item = item_class(x=x, y=y)
+        self.gameview.item_list.append(new_item)
 
 
     def back_to_game(self):
-        from LOGIC.logic import GameView
         self.game.switch_scene(GameView(self.game, save_file=self.file))
 

@@ -2,7 +2,7 @@ import arcade
 import os
 
 from LOGIC.menu.button_sprite import ButtonSprite
-from LOGIC.Save.save import delete_file
+from LOGIC.save.save import delete_file
 
 MENU_IMAGE = os.path.join(os.path.dirname(__file__), "menu_pause.jpg")
 
