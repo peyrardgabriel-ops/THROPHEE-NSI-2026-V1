@@ -1,5 +1,6 @@
 import os
 import json
+import arcade
 
 MAP_WIDTH = 5000
 MAP_HEIGHT = 5000
@@ -39,4 +40,25 @@ def delete_file(file_to_delete):
     chemin = os.path.dirname(__file__)
     fichier = os.path.join(chemin, file_to_delete)
     os.remove(fichier)
-    load_file(file_to_delete)
+    load_file(file_to_delete)  
+
+
+def sprite_list_to_dict(sprite_list):
+    data = []
+    if sprite_list:
+        for sprite in sprite_list:
+            data.append({"texture": sprite.texture,
+            "center_x": sprite.center_x,
+            "center_y": sprite.center_y,
+            "scale": sprite.scale
+            })
+        return data
+
+
+def dict_to_sprite_list(dict):
+    sprite_list = arcade.SpriteList()
+    for data in dict:
+        sprite = arcade.Sprite(data["texture", data["scale"]])
+        sprite.center_x = data["center_x"]
+        sprite.center_y = data["center_y"]
+        sprite_list.append(sprite)
