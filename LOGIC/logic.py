@@ -169,8 +169,9 @@ class GameView(arcade.View):
             if arcade.check_for_collision_with_list(bullet, self.player_list):
                 self.player.hp -= 1
                 bullet.remove_from_sprite_lists()
-                if self.player.hp <= 0:
-                    self.open_gameover()
+
+        if self.player.hp <= 0:
+            self.open_gameover()       
 
         
         
@@ -213,7 +214,12 @@ class GameView(arcade.View):
 
     def on_show_view(self):
         self.camera.position = self.player.position
-        self.create_enemy(100)
+        if len(self.enemy_list) < self.number_max_enemy:
+            self.create_enemy(self.number_max_enemy - len(self.enemy_list))
+
+    def on_hide_view(self):
+        self.player.key_pressed.clear()
+        
         
     
     def on_fixed_update(self, delta_time):
@@ -283,12 +289,22 @@ class GameView(arcade.View):
     def open_inventory(self):
         from LOGIC.menu.menu_inventory.menu_inventaire import InventoryMenu
         inventory_menu = InventoryMenu(self.game,
-                                        file=self.save_file)
+                                        file=self.save_file,
+                                        inventory=self.inventory_cls,
+                                        gameview=self)
         self.game.switch_scene(inventory_menu)
 
     def open_gameover(self):
         from LOGIC.menu.menu_gameover.menu_gameover import MenuGameover
-        self.game.switch_scene(MenuGameover(game=self.game, file=self.save_file))
+        for item in self.inventory:
+            for _ in range(item[1]):
+                x_uncertainty = random.randint(-100, 100) 
+                y_uncertainty = random.randint(-100, 100) 
+                self.drop_item(x=self.player.center_x + x_uncertainty,
+                            y = self.player.center_y + y_uncertainty,
+                            item= item[0])
+        
+        self.game.switch_scene(MenuGameover(game=self.game, file=self.save_file, gameview=self))
 
     def open_craft(self):
         from LOGIC.menu.menu_craft.menu_craft import MenuCraft
