@@ -281,7 +281,7 @@ class GameView(arcade.View):
     # Differents menus
     def open_pause(self):
         from LOGIC.menu.menu_pause.menu_pause import MenuPause
-        self.game.switch_scene(MenuPause(self.game, self.save_file, gameview=self))
+        self.window.show_view(MenuPause(self.game, self.save_file, gameview=self))
 
     def open_inventory(self):
         from LOGIC.menu.menu_inventory.menu_inventaire import InventoryMenu
@@ -289,7 +289,7 @@ class GameView(arcade.View):
                                         file=self.save_file,
                                         inventory=self.inventory_cls,
                                         gameview=self)
-        self.game.switch_scene(inventory_menu)
+        self.window.show_view(inventory_menu)
 
     def open_gameover(self):
         from LOGIC.menu.menu_gameover.menu_gameover import MenuGameover
@@ -305,7 +305,7 @@ class GameView(arcade.View):
 
     def open_craft(self):
         from LOGIC.menu.menu_craft.menu_craft import MenuCraft
-        self.game.switch_scene(MenuCraft(self.game, self.save_file, gameview=self))
+        self.window.show_view(MenuCraft(self.game, self.save_file, gameview=self))
 
 
     # Ennemis
