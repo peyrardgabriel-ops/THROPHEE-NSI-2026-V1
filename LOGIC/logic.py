@@ -216,6 +216,8 @@ class GameView(arcade.View):
         self.camera.position = self.player.position
         if len(self.enemy_list) < self.number_max_enemy:
             self.create_enemy(self.number_max_enemy - len(self.enemy_list))
+        if self.map.can_attack:
+            self.choose_best_sword()
 
     def on_hide_view(self):
         self.player.key_pressed.clear()
@@ -237,12 +239,6 @@ class GameView(arcade.View):
         
 
         
-        
-
-        
-            
-        
-
 
 # Fonction non présentes de base dans arcade
     def pan_camera_to_player(self, panning_fraction: float = 1.0):
@@ -267,7 +263,7 @@ class GameView(arcade.View):
         item_class = self.get_item_class(item)
         if item_class == None:
             raise ValueError(f"Item inconnu : {item}")
-        new_item = item_class(x=x, y=y)
+        new_item = item_class(x=x, y=y, gameview=self)
         self.item_list.append(new_item)
 
 
@@ -278,13 +274,14 @@ class GameView(arcade.View):
             if arcade.check_for_collision_with_list(item, self.player_list):
                 self.inventory_cls.add_to_inventory(item.type)
                 item.remove_from_sprite_lists()
+                self.inventory_cls.choose_best_sword()
 
 
 
     # Differents menus
     def open_pause(self):
         from LOGIC.menu.menu_pause.menu_pause import MenuPause
-        self.game.switch_scene(MenuPause(self.game, self.save_file))
+        self.game.switch_scene(MenuPause(self.game, self.save_file, gameview=self))
 
     def open_inventory(self):
         from LOGIC.menu.menu_inventory.menu_inventaire import InventoryMenu
@@ -304,11 +301,11 @@ class GameView(arcade.View):
                             y = self.player.center_y + y_uncertainty,
                             item= item[0])
         
-        self.game.switch_scene(MenuGameover(game=self.game, file=self.save_file, gameview=self))
+        self.window.show_view(MenuGameover(game=self.game, file=self.save_file, gameview=self))
 
     def open_craft(self):
         from LOGIC.menu.menu_craft.menu_craft import MenuCraft
-        self.game.switch_scene(MenuCraft(self.game, self.save_file))
+        self.game.switch_scene(MenuCraft(self.game, self.save_file, gameview=self))
 
 
     # Ennemis
