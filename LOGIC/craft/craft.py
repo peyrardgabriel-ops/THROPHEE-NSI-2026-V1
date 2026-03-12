@@ -6,7 +6,7 @@ from LOGIC.inventory.inventory import Inventory
 PATH_TO_RECIPE = "LOGIC/craft/recipes.json"
 
 class Craft:
-    def __init__(self, file):
+    def __init__(self, file, gameview):
         self.recipes = self.load_recipes()
         self.inventory_cls = Inventory(file)
 
