@@ -1,10 +1,8 @@
 import arcade
 import random
 
-from LOGIC.inventory.inventory import Inventory
 from LOGIC.entity.item_cls import *
 from LOGIC.entity.item import Item
-from LOGIC.logic import GameView
 
 
 
@@ -33,11 +31,16 @@ class InventoryMenu(arcade.View):
         self.inventory = inventory
         self.gameview = gameview
 
+        
+
         case_width = 80
         case_height = 80
         self.case_list = arcade.SpriteList()
         self.item_list = arcade.SpriteList()
         self.text_list = []
+        self.name_list = []
+
+        
 
         self.text = arcade.Text(f"Inventory",
                                 x= self.window.width // 2 - 50,
@@ -66,6 +69,8 @@ class InventoryMenu(arcade.View):
         self.item_list.draw()
         for texts in self.text_list:
             texts.draw()
+        for name in self.name_list:
+            name.draw()
 
     def on_key_press(self, symbol, modifiers):
         if symbol == arcade.key.ESCAPE or symbol == arcade.key.A:
@@ -82,6 +87,23 @@ class InventoryMenu(arcade.View):
         self.text_list.clear()
         self.text_list.append(self.text)
         self.place_item()
+
+
+    def on_mouse_motion(self, x, y, dx, dy):
+        self.name_list.clear()
+        for item in self.item_list:
+            if (item.center_x - 50 <= x <= item.center_x + 50 and
+                    item.center_y - 50 <= y <= item.center_y + 50):
+                text = arcade.Text(x = item.center_x,
+                                       y = item.center_y + 50,
+                                       color=arcade.color.BLACK,
+                                       text=item.name,
+                                       font_size=14)
+                self.name_list.append(text)
+                
+    
+    
+        
                     
                     
 
@@ -125,7 +147,7 @@ class InventoryMenu(arcade.View):
         self.inventory.remove_from_inventory(item)
         x = random.randint(-100, 100) + self.gameview.player.center_x
         y = random.randint(-100, 100) + self.gameview.player.center_y
-        new_item = item_class(x=x, y=y)
+        new_item = item_class(x=x, y=y, gameview = self.gameview)
         self.gameview.item_list.append(new_item)
         
 

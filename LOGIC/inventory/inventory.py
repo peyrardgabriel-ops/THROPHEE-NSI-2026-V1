@@ -33,13 +33,13 @@ class Inventory():
             
         if len(self.inventory) < self.capacity:
             self.inventory.append((obj, number_of_item))
+        
 
     
     def remove_from_inventory(self, obj, number_of_item:int = 1):
         if number_of_item == 0:
             return
         for i, (name, quantity) in enumerate(self.inventory):
-            print(name, quantity)
             if name == obj:
                 self.inventory[i] = (name, quantity - number_of_item)
                 if self.inventory[i][1] < 0:
@@ -69,7 +69,7 @@ class Inventory():
 
     def choose_best_sword(self):
         
-        swords = [i for i in [get_item_class(item[0]) for item in self.inventory if "sword" in item[0]] if i ]
+        swords = [i for i in [get_item_class(item[0]) for item in self.inventory if "sword" in item[0]] if i]
 
         if not swords:
             return entity.item_cls.fist.Fist
@@ -77,7 +77,7 @@ class Inventory():
         best_sword = swords[0]
 
         for sword in swords:
-            if sword.get_damage() > best_sword.get_damage():
+            if sword.damage > best_sword.damage:
                 best_sword = sword
 
         return best_sword

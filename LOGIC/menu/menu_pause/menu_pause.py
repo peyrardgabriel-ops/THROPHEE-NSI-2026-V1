@@ -8,10 +8,11 @@ MENU_IMAGE = os.path.join(os.path.dirname(__file__), "menu_pause.jpg")
 
 
 class MenuPause(arcade.View):
-    def __init__(self, game, file):
+    def __init__(self, game, file, gameview):
         super().__init__()
         self.game = game
         self.file = file
+        self.gameview = gameview
 
         # Sprite du menu
         self.menu_sprite = arcade.Sprite(MENU_IMAGE, scale=1.0)
@@ -91,5 +92,4 @@ class MenuPause(arcade.View):
         self.game.switch_scene(MenuStart(self.game))
     
     def load_game(self):
-        from LOGIC.logic import GameView
-        self.game.switch_scene(GameView(self.game, save_file=self.file))
+        self.game.switch_scene(self.gameview)

@@ -4,12 +4,13 @@ from LOGIC.menu.button_sprite import ButtonSprite
 from LOGIC.craft.craft import Craft
 
 class MenuCraft(arcade.View):
-    def __init__(self, game, file):
+    def __init__(self, game, file, gameview):
         self.game = game
         self.file = file
+        self.gameview = gameview
         super().__init__()
 
-        self.craft = Craft(file)
+        self.craft = Craft(file, gameview)
 
         self.button_list = arcade.SpriteList()
         self.button_width = 300
@@ -74,7 +75,7 @@ class MenuCraft(arcade.View):
 
     def load_game(self):
         from LOGIC.logic import GameView
-        self.game.switch_scene(GameView(self.game, save_file=self.file))
+        self.game.switch_scene(self.gameview)
 
     def refresh_buttons(self):
         self.button_list.clear()
