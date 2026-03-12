@@ -6,4 +6,5 @@ from .stick import Stick
 from .stone import Stone
 from .swords.wooden_sword import WoodenSword
 from .swords.iron_sword import IronSword
+from .swords.stone_sword import StoneSword
 from .iron_ingot import IronIngot

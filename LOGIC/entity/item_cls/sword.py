@@ -65,9 +65,5 @@ class Sword(Item):
                 self.angle = 90 - math.degrees(math.atan2(dy, dx))
                 if self.attack_target_angle <= -(3 * math.pi) / 2:
                     self.is_attacking = False
-
-    @staticmethod
-    def get_damage():
-        return 0
         
          

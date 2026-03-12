@@ -10,6 +10,3 @@ class Fist(Sword):
     def __init__(self, x, y, gameview):
         super().__init__(x, y, gameview=gameview, texture = self.path_or_texture, damage=self.damage)
     
-    @staticmethod
-    def get_damage():
-        return 1
