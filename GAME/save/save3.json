@@ -1,0 +1,12 @@
+{
+    "inventory": [
+        [
+            "sword",
+            1
+        ]
+    ],
+    "player": {
+        "player_x": 2500,
+        "player_y": 2500
+    }
+}
