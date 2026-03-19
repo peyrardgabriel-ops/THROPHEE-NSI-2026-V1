@@ -1,19 +1,18 @@
 import arcade
-from LOGIC.menu.menu_intro.menu_intro import MenuIntro
+from GAME.menu.menu_intro.menu_intro import MenuIntro
+
 
 arcade.enable_timings()
 
-
-
-class Game(arcade.Window):
+class Game:
     def __init__(self):
-        super().__init__(title="Jeu", fullscreen=True)
-        self.center_window()
-        self.show_view(MenuIntro(self))
+        window.show_view(MenuIntro(self))
 
-    
-    def switch_scene(self, view):
-        self.show_view(view)
+    def switch_scene(self, new_scene):
+        window.show_view(new_scene)
+
+window = arcade.Window(fullscreen=True, vsync=True)
+window.center_window()
 
 game = Game()
 arcade.run()
